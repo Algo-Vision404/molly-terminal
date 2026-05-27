@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/ploglabs/molly-terminal/internal/model"
+	"github.com/ploglabs/molly-terminal/internal/sanitize"
 )
 
 const (
@@ -328,7 +329,7 @@ func (c *Client) readLoop() {
 		case "typing_start", "typing":
 			te := model.TypingEvent{
 				Type:     "typing",
-				Username: evt.Username,
+				Username: sanitize.Sanitize(evt.Username), // sanitize incoming username
 				Channel:  evt.Channel,
 			}
 			select {
@@ -343,14 +344,14 @@ func (c *Client) readLoop() {
 			msg := model.Message{
 				EventType:      evt.Type,
 				ID:             evt.MessageID,
-				Username:       evt.Username,
+				Username:       sanitize.Sanitize(evt.Username),
 				UserID:         evt.UserID,
-				Content:        evt.Content,
+				Content:        sanitize.Sanitize(evt.Content),
 				Channel:        evt.Channel,
 				Timestamp:      ts,
 				ReplyToID:      evt.ReplyToID,
-				ReplyToContent: evt.ReplyToContent,
-				ReplyToAuthor:  evt.ReplyToAuthor,
+				ReplyToContent: sanitize.Sanitize(evt.ReplyToContent),
+				ReplyToAuthor:  sanitize.Sanitize(evt.ReplyToAuthor),
 				Attachments:    convertAttachments(evt.Attachments),
 				Editable:       evt.Editable,
 			}
