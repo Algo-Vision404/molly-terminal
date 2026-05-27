@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/ploglabs/molly-terminal/internal/auth"
 )
 
 const defaultTimeout = 5 * time.Second
@@ -53,9 +55,7 @@ func (c *Client) FetchGuilds(query string) ([]Guild, error) {
 	if err != nil {
 		return nil, fmt.Errorf("building request: %w", err)
 	}
-	if c.apiKey != "" {
-		req.Header.Set("X-API-Key", c.apiKey)
-	}
+	auth.SetAuthHeader(req.Header, c.apiKey)
 
 	resp, err := c.client.Do(req)
 	if err != nil {

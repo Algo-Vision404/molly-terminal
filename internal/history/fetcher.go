@@ -8,6 +8,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ploglabs/molly-terminal/internal/auth"
 	"github.com/ploglabs/molly-terminal/internal/model"
 )
 
@@ -62,11 +63,9 @@ func (f *Fetcher) Fetch(channel string, limit int, before *time.Time) ([]model.M
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("building history request: %w", err)
+		return nil, err
 	}
-	if f.apiKey != "" {
-		req.Header.Set("X-API-Key", f.apiKey)
-	}
+	auth.SetAuthHeader(req.Header, f.apiKey)
 
 	resp, err := f.httpClient.Do(req)
 	if err != nil {
@@ -102,9 +101,7 @@ func (f *Fetcher) FetchChannels() ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("building channels request: %w", err)
 	}
-	if f.apiKey != "" {
-		req.Header.Set("X-API-Key", f.apiKey)
-	}
+	auth.SetAuthHeader(req.Header, f.apiKey)
 
 	resp, err := f.httpClient.Do(req)
 	if err != nil {
@@ -204,9 +201,8 @@ func (f *Fetcher) FetchSince(channel string, since time.Time) tea.Cmd {
 		if err != nil {
 			return FetchResultMsg{Channel: channel, Err: err}
 		}
-		if f.apiKey != "" {
-			req.Header.Set("X-API-Key", f.apiKey)
-		}
+		auth.SetAuthHeader(req.Header, f.apiKey)
+
 		resp, err := f.httpClient.Do(req)
 		if err != nil {
 			return FetchResultMsg{Channel: channel, Err: err}

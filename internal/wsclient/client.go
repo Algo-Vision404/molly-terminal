@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/ploglabs/molly-terminal/internal/auth"
 	"github.com/ploglabs/molly-terminal/internal/model"
 	"github.com/ploglabs/molly-terminal/internal/sanitize"
 )
@@ -237,14 +238,16 @@ func (c *Client) dial() error {
 	c.connMu.Lock()
 	defer c.connMu.Unlock()
 
+	if c.apiKey == "" {
+		return fmt.Errorf("no credentials provided")
+	}
+
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
 	}
 
 	header := make(http.Header)
-	if c.apiKey != "" {
-		header.Set("X-API-Key", c.apiKey)
-	}
+	auth.SetAuthHeader(header, c.apiKey)
 
 	conn, _, err := dialer.DialContext(context.Background(), c.url, header)
 	if err != nil {

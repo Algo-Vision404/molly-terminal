@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ploglabs/molly-terminal/internal/auth"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -120,11 +121,9 @@ func (s *Sender) SendFile(path, channel, content string) (string, error) {
 		return "", fmt.Errorf("failed to build request: %w", err)
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	if s.apiKey != "" {
-		req.Header.Set("X-API-Key", s.apiKey)
-	}
+	auth.SetAuthHeader(req.Header, s.apiKey)
 
-	resp, err := s.client.Do(req)
+	resp, err := (&http.Client{Timeout: 30 * time.Second}).Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to send file to relay: %w", err)
 	}
@@ -203,11 +202,9 @@ func (s *Sender) sendViaRelay(content, channel, replyToID string) (string, error
 		return "", fmt.Errorf("failed to build request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	if s.apiKey != "" {
-		req.Header.Set("X-API-Key", s.apiKey)
-	}
+	auth.SetAuthHeader(req.Header, s.apiKey)
 
-	resp, err := s.client.Do(req)
+	resp, err := (&http.Client{Timeout: 5 * time.Second}).Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to send message to relay: %w", err)
 	}

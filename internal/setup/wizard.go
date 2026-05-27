@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ploglabs/molly-terminal/internal/auth"
 	"github.com/ploglabs/molly-terminal/internal/auth/discord"
 	"github.com/ploglabs/molly-terminal/internal/config"
 )
@@ -406,9 +407,7 @@ func pollBotPresence(ctx context.Context, checkURL, apiKey string) (bool, error)
 	if err != nil {
 		return false, err
 	}
-	if apiKey != "" {
-		req.Header.Set("X-API-Key", apiKey)
-	}
+	auth.SetAuthHeader(req.Header, apiKey)
 
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
@@ -497,9 +496,7 @@ func fetchWebConfig(cfg *config.Config, state *WizardState) (*webSetupConfig, bo
 	if err != nil {
 		return nil, false
 	}
-	if cfg.Server.APIKey != "" {
-		req.Header.Set("X-API-Key", cfg.Server.APIKey)
-	}
+	auth.SetAuthHeader(req.Header, cfg.Server.APIKey)
 
 	resp, err := (&http.Client{Timeout: 5 * time.Second}).Do(req)
 	if err != nil {
