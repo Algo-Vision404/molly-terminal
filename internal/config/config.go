@@ -95,7 +95,7 @@ func Default() *Config {
 		Server: ServerConfig{
 			WebsocketURL: "wss://molly.ploglabs.com:8443/ws",
 			WebhookURL:   "",
-			RelayURL:     "https://molly.ploglabs.com:8080",
+			RelayURL:     "https://molly.ploglabs.com:8443",
 			BotClientID:  "1503351063468572754",
 			WebSetupURL:  "https://molly.ploglabs.com",
 		},
@@ -120,7 +120,7 @@ func (c *Config) ApplyDefaults() {
 		c.General.Channel = "general"
 	}
 	if c.Server.RelayURL == "" {
-		c.Server.RelayURL = "https://molly.ploglabs.com:8080"
+		c.Server.RelayURL = "https://molly.ploglabs.com:8443"
 	}
 	if c.Server.BotClientID == "" {
 		c.Server.BotClientID = "1503351063468572754"
