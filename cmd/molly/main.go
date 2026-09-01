@@ -339,8 +339,10 @@ func runSetupRestart(configPath string) {
 		showServerPicker(cfg, configPath)
 	}
 
-	execPath, _ := os.Executable()
-	_ = syscall.Exec(execPath, os.Args, os.Environ())
+	if err := restartSelf(); err != nil {
+		fmt.Fprintf(os.Stderr, "%s restart: %v\n", cAccent("✗"), err)
+		os.Exit(1)
+	}
 }
 
 func runServerPrompt(configPath string) {
@@ -356,8 +358,10 @@ func runServerPrompt(configPath string) {
 
 	showServerPicker(cfg, configPath)
 
-	execPath, _ := os.Executable()
-	_ = syscall.Exec(execPath, os.Args, os.Environ())
+	if err := restartSelf(); err != nil {
+		fmt.Fprintf(os.Stderr, "%s restart: %v\n", cAccent("✗"), err)
+		os.Exit(1)
+	}
 }
 
 func runGlobalPrompt(configPath string) {
@@ -467,6 +471,8 @@ func runGlobalPrompt(configPath string) {
 	}
 	fmt.Println()
 
-	execPath, _ := os.Executable()
-	_ = syscall.Exec(execPath, os.Args, os.Environ())
+	if err := restartSelf(); err != nil {
+		fmt.Fprintf(os.Stderr, "%s restart: %v\n", cAccent("✗"), err)
+		os.Exit(1)
+	}
 }
